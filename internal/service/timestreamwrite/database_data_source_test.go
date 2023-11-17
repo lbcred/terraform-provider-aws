@@ -55,7 +55,7 @@ func TestAccTimestreamWriteDatabaseDataSource_basic(t *testing.T) {
 	}
 
 	resourceName := "aws_timestreamwrite_database.test"
-	rName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
+	databaseName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 	dataSourceName := "data.aws_timestreamwrite_database.test"
 
 	resource.ParallelTest(t, resource.TestCase{
@@ -65,7 +65,7 @@ func TestAccTimestreamWriteDatabaseDataSource_basic(t *testing.T) {
 		CheckDestroy:             testAccCheckDatabaseDestroy(ctx),
 		Steps: []resource.TestStep{
 			{
-				Config: testAccDatabaseDataSourceConfig_basic(rName),
+				Config: testAccDatabaseDataSourceConfig_basic(databaseName),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrPair(dataSourceName, "arn", resourceName, "arn"),
 					resource.TestCheckResourceAttrPair(dataSourceName, "creation_time", resourceName, "creation_time"),
@@ -79,7 +79,7 @@ func TestAccTimestreamWriteDatabaseDataSource_basic(t *testing.T) {
 	})
 }
 
-func testAccDatabaseDataSourceConfig_basic(rName string) string {
+func testAccDatabaseDataSourceConfig_basic(databaseName string) string {
 	return fmt.Sprintf(`
 resource "aws_kms_key" "test" {
   description = %[1]q
@@ -107,6 +107,6 @@ resource "aws_timestreamwrite_database" "test" {
 }
 
 data "aws_timestreamwrite_database" "test" {
-  database_name = aws_timestreamwrite_database.name
-}`, rName)
+  database_name = aws_timestreamwrite_database.test.name
+}`, databaseName)
 }
