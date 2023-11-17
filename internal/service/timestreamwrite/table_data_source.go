@@ -185,7 +185,16 @@ func (d *dataSourceTable) Read(ctx context.Context, req datasource.ReadRequest, 
 	// these cases the flatten function may have a diagnostics return value, which
 	// should be appended to resp.Diagnostics.
 
-	//data.MagneticStoreWriteProperties = flattenMagneticStoreWriteProperties(out.MagneticStoreWriteProperties)
+	FlattenedMagneticStoreWriteProperties := flattenMagneticStoreWriteProperties(out.MagneticStoreWriteProperties)
+	MagneticStoreWriteProperties := FlattenedMagneticStoreWriteProperties[0].(magneticStoreWriteProperties)
+
+	data.MagneticStoreWriteProperties = MagneticStoreWriteProperties
+
+	FlattenedRetentionProperties := flattenRetentionProperties(out.RetentionProperties)
+	RetentionProperties := FlattenedRetentionProperties[0].(retentionProperties)
+
+	data.RetentionProperties = RetentionProperties
+
 	//
 	//// TIP: Setting a complex type.
 	//complexArgument, diag := flattenComplexArgument(ctx, out.ComplexArgument)
@@ -211,15 +220,15 @@ func (d *dataSourceTable) Read(ctx context.Context, req datasource.ReadRequest, 
 // See more:
 // https://developer.hashicorp.com/terraform/plugin/framework/handling-data/accessing-values
 type dataSourceTableData struct {
-	ARN                          types.String        `tfsdk:"arn"`
-	CreationTime                 types.Int64         `tfsdk:"creation_time"`
-	DatabaseName                 types.String        `tfsdk:"database_name"`
-	LastUpdatedTime              types.Int64         `tfsdk:"last_updated_time"`
-	MagneticStoreWriteProperties types.Map           `tfsdk:"magnetic_store_write_properties"`
-	RetentionProperties          retentionProperties `tfsdk:"retention_properties"`
-	TableSchema                  tableSchema         `tfsdk:"schema"`
-	TableName                    types.String        `tfsdk:"table_name"`
-	TableStatus                  types.String        `tfsdk:"table_status"`
+	ARN                          types.String                 `tfsdk:"arn"`
+	CreationTime                 types.Int64                  `tfsdk:"creation_time"`
+	DatabaseName                 types.String                 `tfsdk:"database_name"`
+	LastUpdatedTime              types.Int64                  `tfsdk:"last_updated_time"`
+	MagneticStoreWriteProperties magneticStoreWriteProperties `tfsdk:"magnetic_store_write_properties"`
+	RetentionProperties          retentionProperties          `tfsdk:"retention_properties"`
+	TableSchema                  tableSchema                  `tfsdk:"schema"`
+	TableName                    types.String                 `tfsdk:"table_name"`
+	TableStatus                  types.String                 `tfsdk:"table_status"`
 }
 
 type magneticStoreWriteProperties struct {

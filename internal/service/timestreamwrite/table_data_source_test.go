@@ -34,9 +34,8 @@ import (
 	// need to import types and reference the nested types, e.g., as
 	// types.<Type Name>.
 	"fmt"
-	"testing"
-
 	"github.com/YakDriver/regexache"
+	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/timestreamwrite"
 	"github.com/aws/aws-sdk-go-v2/service/timestreamwrite/types"
@@ -140,9 +139,12 @@ func TestAccTimestreamWriteTableDataSource_basic(t *testing.T) {
 	}
 
 	var table types.Table
+
 	databaseName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
 	tableName := sdkacctest.RandomWithPrefix(acctest.ResourcePrefix)
+
 	dataSourceName := "data.aws_timestreamwrite_table.test"
+	resourceName := "aws_timestreamwrite_table.test"
 
 	resource.ParallelTest(t, resource.TestCase{
 		PreCheck: func() {
@@ -158,15 +160,13 @@ func TestAccTimestreamWriteTableDataSource_basic(t *testing.T) {
 				Config: testAccTableDataSourceConfig_basic(databaseName, tableName),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckTableExists(ctx, dataSourceName, &table),
-					resource.TestCheckResourceAttr(dataSourceName, "auto_minor_version_upgrade", "false"),
-					resource.TestCheckResourceAttrSet(dataSourceName, "maintenance_window_start_time.0.day_of_week"),
-					resource.TestCheckTypeSetElemNestedAttrs(dataSourceName, "user.*", map[string]string{
-						"console_access": "false",
-						"groups.#":       "0",
-						"username":       "Test",
-						"password":       "TestTest1234",
-					}),
 					acctest.MatchResourceAttrRegionalARN(dataSourceName, "arn", "timestreamwrite", regexache.MustCompile(`table:+.`)),
+					resource.TestCheckResourceAttrPair(dataSourceName, "arn", resourceName, "arn"),
+					resource.TestCheckResourceAttrPair(dataSourceName, "creation_time", resourceName, "creation_time"),
+					resource.TestCheckResourceAttrPair(dataSourceName, "database_name", resourceName, "database_name"),
+					resource.TestCheckResourceAttrPair(dataSourceName, "last_updated_time", resourceName, "last_updated_time"),
+					resource.TestCheckResourceAttrPair(dataSourceName, "table_name", resourceName, "table_name"),
+					resource.TestCheckResourceAttrPair(dataSourceName, "table_status", resourceName, "table_status"),
 				),
 			},
 		},
